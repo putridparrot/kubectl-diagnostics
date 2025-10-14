@@ -1,9 +1,9 @@
 ﻿use k8s_openapi::api::core::v1::Pod;
 use kube::{Api, Client};
 use kube::api::ListParams;
-use crate::diagnostic::Diagnostic;
-use crate::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
-use crate::output_mode::OutputMode;
+use crate::diagnostics::diagnostic::Diagnostic;
+use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
+use crate::diagnostics::output_mode::OutputMode;
 
 #[derive(Debug)]
 pub struct PodsDiagnostic {

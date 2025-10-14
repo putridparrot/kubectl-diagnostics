@@ -1,22 +1,12 @@
 mod args;
-mod output_mode;
-mod diagnostic_report;
-mod pods_diagnostics;
-mod diagnostic;
-mod events_diagnostic;
-mod nodes_diagnostic;
-mod services_diagnostics;
+mod diagnostics;
 
 use crate::args::Args;
-use crate::diagnostic::Diagnostic;
-use crate::events_diagnostic::EventsDiagnostic;
-use crate::nodes_diagnostic::NodesDiagnostic;
-use crate::pods_diagnostics::PodsDiagnostic;
-use crate::services_diagnostics::ServicesDiagnostic;
 use anyhow::Result;
 use clap::Parser;
 use colored::*;
 use kube::Client;
+use crate::diagnostics::*;
 
 #[tokio::main]
 async fn main() -> Result<()> {

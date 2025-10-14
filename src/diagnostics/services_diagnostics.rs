@@ -1,10 +1,10 @@
-﻿use k8s_openapi::api::core::v1::{Endpoints, Event, Node};
-use kube::{Api, Client};
+﻿use crate::diagnostics::diagnostic::Diagnostic;
+use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
+use crate::diagnostics::output_mode::OutputMode;
+use k8s_openapi::api::core::v1::Endpoints;
 use kube::api::ListParams;
 use kube::runtime::reflector::Lookup;
-use crate::diagnostic::Diagnostic;
-use crate::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
-use crate::output_mode::OutputMode;
+use kube::{Api, Client};
 
 #[derive(Debug)]
 pub struct ServicesDiagnostic {
