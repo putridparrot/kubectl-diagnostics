@@ -8,3 +8,11 @@ pub struct Args {
     #[arg(short, long)]
     pub namespace: Option<String>,
 }
+
+// #[derive(Parser)]
+// enum DiagnoseTarget {
+//     Pods(PodsArgs),
+//     Events(EventsArgs),
+//     Nodes(NodesArgs),
+//     Services(ServicesArgs),
+// }
