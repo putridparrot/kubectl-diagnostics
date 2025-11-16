@@ -2,30 +2,35 @@
 
 ### NOTE: This is work in progress. This README is just an outline of potential features.
 
-kube-diagnosis --namespace my-ns
+kube-diagnostics is aimed at helping troubleshoot Kubernetes clusters and applications hosted within it. It can be deployed as a 
+kubectl plugin, or run using it's executable name. 
+
+## Usage
 
 Subcommands:
 
 - events: Show sorted events
+- nodes: Show node status
 - pods: Show pod status and container errors
-- describe: Describe specific resources
-- report: Save findings to file
+- services: Show service status
+- all: Run all subcommands
 
-## Pod Filtering
+Each subcommand comes with its own arguments and flags.
 
-kubectl get pods -n my-ns -o json
+Examples:
 
-Filter pods by:
-- status.phase != Running
-- containerStatuses[].state.waiting.reason
-- restartCount > 3
+```aiignore
+diagnostics pods --namespace default
+diagnostics nodes
+diagnostics events --namespace dev
+diagnostics services --namespace stg
 
-Parse JSON and extract:
-- CrashLoopBackOff
-- ImagePullBackOff
-- Readiness probe failures
+diagnostics all --namespace tst
+```
 
-## Event Correlation
+## Event Diagnostics
+
+TODO:
 
 kubectl get events -n my-ns --sort-by='.lastTimestamp'
 
@@ -39,6 +44,27 @@ Output Formats:
 - Markdown for CI logs
 - JSON for pipeline parsing
 - File artifact for Azure DevOps upload
+
+## Node Diagnostics
+
+## Pod Diagnostics
+
+TODO:
+
+kubectl get pods -n my-ns -o json
+
+Filter pods by:
+- status.phase != Running
+- containerStatuses[].state.waiting.reason
+- restartCount > 3
+
+Parse JSON and extract:
+- CrashLoopBackOff
+- ImagePullBackOff
+- Readiness probe failures
+
+## Service Diagnostics
+
  
 ## Azure Devops Integration
 

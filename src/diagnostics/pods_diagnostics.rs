@@ -1,18 +1,47 @@
-﻿use k8s_openapi::api::core::v1::Pod;
+﻿use colored::Colorize;
+use k8s_openapi::api::core::v1::Pod;
 use kube::{Api, Client};
 use kube::api::ListParams;
 use crate::diagnostics::diagnostic::Diagnostic;
 use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
-use crate::diagnostics::output_mode::OutputMode;
 
-#[derive(Debug)]
-pub struct PodsDiagnostic {
-    pub output_mode: OutputMode,
+pub struct PodsDiagnostic<'a> {
+    client: &'a Client,
+    namespace: &'a str
 }
 
-impl Diagnostic for PodsDiagnostic {
-    async fn run(&self, client: Client, namespace: &str) -> anyhow::Result<DiagnosticReport> {
-        let pods: Api<Pod> = Api::namespaced(client, &namespace);
+/// Convenience constructor
+impl<'a> PodsDiagnostic<'a> {
+    pub fn new(client: &'a Client, namespace: &'a str) -> Self {
+        Self {
+            client,
+            namespace
+        }
+    }
+}
+
+pub struct PodsDiagnosticReport {
+    pub meta: DiagnosticReport
+}
+
+impl PodsDiagnosticReport {
+    pub fn output_report(self) {
+        println!("\n{} {}", "Pod Diagnostics: ".bold(), self.meta.summary.yellow());
+        for pod_report in self.meta.issues {
+            println!("{} {} : {}",
+                     "•".cyan(),
+                     pod_report.resource.red(),
+                     pod_report.message,
+            );
+        }
+    }
+}
+
+impl<'a> Diagnostic for PodsDiagnostic<'a> {
+    type Report = PodsDiagnosticReport;
+    
+    async fn generate_report(&self) -> anyhow::Result<PodsDiagnosticReport> {
+        let pods: Api<Pod> = Api::namespaced(self.client.clone(), &self.namespace);
         let lp = ListParams::default().limit(100);
         let pod_list = pods.list(&lp).await?;
 
@@ -97,9 +126,9 @@ impl Diagnostic for PodsDiagnostic {
                 }
             }
         }
-        Ok(DiagnosticReport {
+        Ok(PodsDiagnosticReport{ meta: DiagnosticReport {
             summary: format!("{} pods analyzed", count),
             issues,
-        })
+        }})
     }
 }

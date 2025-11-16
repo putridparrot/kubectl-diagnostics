@@ -1,18 +1,45 @@
-﻿use k8s_openapi::api::core::v1::{Event, Node};
-use kube::{Api, Client};
-use kube::api::ListParams;
-use crate::diagnostics::diagnostic::Diagnostic;
+﻿use crate::diagnostics::diagnostic::Diagnostic;
 use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
-use crate::diagnostics::output_mode::OutputMode;
+use colored::Colorize;
+use k8s_openapi::api::core::v1::Node;
+use kube::api::ListParams;
+use kube::{Api, Client};
 
-#[derive(Debug)]
-pub struct NodesDiagnostic {
-    pub output_mode: OutputMode,
+pub struct NodesDiagnostic<'a> {
+    client: &'a Client
 }
 
-impl Diagnostic for NodesDiagnostic {
-    async fn run(&self, client: Client, namespace: &str) -> anyhow::Result<DiagnosticReport> {
-        let nodes: Api<Node> = Api::all(client.clone());
+/// Convenience constructor
+impl<'a> NodesDiagnostic<'a> {
+    pub fn new(client: &'a Client) -> Self {
+        Self {
+            client
+        }
+    }
+}
+
+pub struct NodesDiagnosticReport {
+    pub meta: DiagnosticReport
+}
+
+impl NodesDiagnosticReport {
+    pub fn output_report(self) {
+        println!("\n{} {}", "Nodes Diagnostics: ".bold(), self.meta.summary.yellow());
+        for node_report in self.meta.issues {
+            println!("{} {} : {}",
+                     "•".cyan(),
+                     node_report.resource.red(),
+                     node_report.message,
+            );
+        }
+    }
+}
+
+impl<'a> Diagnostic for NodesDiagnostic<'a> {
+    type Report = NodesDiagnosticReport;
+
+    async fn generate_report(&self) -> anyhow::Result<NodesDiagnosticReport> {
+        let nodes: Api<Node> = Api::all(self.client.clone());
         let node_list = nodes.list(&ListParams::default()).await?;
 
         let mut issues = vec![];
@@ -34,9 +61,9 @@ impl Diagnostic for NodesDiagnostic {
             }
         }
 
-        Ok(DiagnosticReport {
+        Ok(NodesDiagnosticReport { meta: DiagnosticReport {
             summary: format!("{} nodes analyzed", count),
             issues,
-        })
+        }})
     }
 }

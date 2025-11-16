@@ -1,20 +1,48 @@
 ﻿use chrono::{DateTime, Utc};
 use colored::Colorize;
-use k8s_openapi::api::core::v1::Event;
+use k8s_openapi::api::core::v1::{Event};
 use kube::{Api, Client};
 use kube::api::ListParams;
 use crate::diagnostics::diagnostic::Diagnostic;
 use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
-use crate::diagnostics::output_mode::OutputMode;
 
-#[derive(Debug)]
-pub struct EventsDiagnostic {
-    pub output_mode: OutputMode,
+pub struct EventsDiagnostic<'a> {
+    client: &'a Client,
+    namespace: &'a str
 }
 
-impl Diagnostic for EventsDiagnostic {
-    async fn run(&self, client: Client, namespace: &str) -> anyhow::Result<DiagnosticReport> {
-        let events: Api<Event> = Api::namespaced(client.clone(), &namespace);
+/// Convenience constructor
+impl<'a> EventsDiagnostic<'a> {
+    pub fn new(client: &'a Client, namespace: &'a str) -> Self {
+        Self {
+            client,
+            namespace
+        }
+    }
+}
+
+pub struct EventsDiagnosticReport {
+    pub meta: DiagnosticReport
+}
+
+impl EventsDiagnosticReport {
+    pub fn output_report(self) {
+        println!("\n{} {}", "Events Diagnostics: ".bold(), self.meta.summary.yellow());
+        for event_report in self.meta.issues {
+            println!("{} {} : {}",
+                     "•".cyan(),
+                     event_report.resource.red(),
+                     event_report.message,
+            );
+        }
+    }
+}
+
+impl<'a> Diagnostic for EventsDiagnostic<'a> {
+    type Report = EventsDiagnosticReport;
+
+    async fn generate_report(&self) -> anyhow::Result<EventsDiagnosticReport> {
+        let events: Api<Event> = Api::namespaced(self.client.clone(), &self.namespace);
         let lp = ListParams::default().limit(100);
         let event_list = events.list(&lp).await?;
 
@@ -38,13 +66,12 @@ impl Diagnostic for EventsDiagnostic {
             ));
         }
 
-        Ok(DiagnosticReport {
+        Ok(EventsDiagnosticReport { meta: DiagnosticReport {
             summary: format!("{} events analyzed", count),
             issues,
-        })
+        }})
     }
 }
-
 
 fn extract_timestamp(e: &Event) -> Option<DateTime<Utc>> {
     if let Some(mt) = &e.event_time {

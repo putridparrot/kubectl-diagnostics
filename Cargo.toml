@@ -12,3 +12,5 @@ tokio = { version = "1.47.1", features = ["rt-multi-thread", "rt", "macros"] }
 colored = "3.0.0"
 clap = { version = "4.5.49", features = ["derive"] }
 chrono = "0.4.42"
+#kube-lib = { git = "https://github.com/putridparrot/kube-lib" }
+#kube-lib = { path = "D:\\Development\\putridparrot\\kube-lib" }

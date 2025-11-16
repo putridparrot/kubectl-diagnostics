@@ -18,8 +18,7 @@ pub struct DiagnosticIssue {
 }
 
 impl DiagnosticIssue {
-    pub fn new(resource: impl Into<String>, message: impl Into<String>, severity: Severity) -> Self {
-        DiagnosticIssue {
+    pub fn new(resource: impl Into<String>, message: impl Into<String>, severity: Severity) -> Self { DiagnosticIssue {
             resource: resource.into(),
             message: message.into(),
             severity,
@@ -34,4 +33,3 @@ pub struct DiagnosticReport {
     pub summary: String,
     pub issues: Vec<DiagnosticIssue>,
 }
-
