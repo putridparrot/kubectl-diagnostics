@@ -1,19 +1,48 @@
-﻿use crate::diagnostics::diagnostic::Diagnostic;
+﻿use colored::Colorize;
+use crate::diagnostics::diagnostic::Diagnostic;
 use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
-use crate::diagnostics::output_mode::OutputMode;
 use k8s_openapi::api::core::v1::Endpoints;
 use kube::api::ListParams;
 use kube::runtime::reflector::Lookup;
 use kube::{Api, Client};
 
-#[derive(Debug)]
-pub struct ServicesDiagnostic {
-    pub output_mode: OutputMode,
+pub struct ServicesDiagnostic<'a> {
+    client: &'a Client,
+    namespace: &'a str
 }
 
-impl Diagnostic for ServicesDiagnostic {
-    async fn run(&self, client: Client, namespace: &str) -> anyhow::Result<DiagnosticReport> {
-        let endpoints: Api<Endpoints> = Api::namespaced(client.clone(), &namespace);
+/// Convenience constructor
+impl<'a> ServicesDiagnostic<'a> {
+    pub fn new(client: &'a Client, namespace: &'a str) -> Self {
+        Self {
+            client,
+            namespace
+        }
+    }
+}
+
+pub struct ServicesDiagnosticReport {
+    pub meta: DiagnosticReport
+}
+
+impl ServicesDiagnosticReport {
+    pub fn output_report(self) {
+        println!("\n{} {}", "Services Diagnostics: ".bold(), self.meta.summary.yellow());
+        for node_report in self.meta.issues {
+            println!("{} {} : {}",
+                     "•".cyan(),
+                     node_report.resource.red(),
+                     node_report.message,
+            );
+        }
+    }
+}
+
+impl<'a> Diagnostic for ServicesDiagnostic<'a> {
+    type Report = ServicesDiagnosticReport;
+
+    async fn generate_report(&self) -> anyhow::Result<ServicesDiagnosticReport> {
+        let endpoints: Api<Endpoints> = Api::namespaced(self.client.clone(), &self.namespace);
 
         // let ep = endpoints.get(&svc_name).await?;
         // if ep.subsets.is_none() || ep.subsets.as_ref().unwrap().is_empty() {
@@ -36,9 +65,9 @@ impl Diagnostic for ServicesDiagnostic {
             }
         }
 
-        Ok(DiagnosticReport {
+        Ok(ServicesDiagnosticReport { meta: DiagnosticReport {
             summary: format!("{} services analyzed", count),
             issues,
-        })
+        }})
     }
 }
