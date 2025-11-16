@@ -10,12 +10,53 @@ pub struct Args {
 
 #[derive(Parser)]
 pub enum DiagnoseTarget {
-    Pods(PodsArgs),
+    ConfigMaps(ConfigMapsArgs),
+    Deployments(DeploymentsArgs),
+    Ingress(IngressArgs),
     Events(EventsArgs),
+    Pods(PodsArgs),
     Nodes(NodesArgs),
+    Resources(ResourcesArgs),
+    Secrets(SecretsArgs),
     Services(ServicesArgs),
     All(AllArgs)
 }
+
+#[derive(Parser)]
+pub struct SecretsArgs {
+    /// The Kubernetes namespace to use
+    #[arg(short, long)]
+    pub namespace: Option<String>,
+}
+
+#[derive(Parser)]
+pub struct ResourcesArgs {
+    /// The Kubernetes namespace to use
+    #[arg(short, long)]
+    pub namespace: Option<String>,
+}
+
+#[derive(Parser)]
+pub struct ConfigMapsArgs {
+    /// The Kubernetes namespace to use
+    #[arg(short, long)]
+    pub namespace: Option<String>,
+}
+
+#[derive(Parser)]
+pub struct DeploymentsArgs {
+    /// The Kubernetes namespace to use
+    #[arg(short, long)]
+    pub namespace: Option<String>,
+}
+
+#[derive(Parser)]
+pub struct IngressArgs {
+    /// The Kubernetes namespace to use
+    #[arg(short, long)]
+    pub namespace: Option<String>,
+}
+
 
 #[derive(Parser)]
 pub struct PodsArgs {

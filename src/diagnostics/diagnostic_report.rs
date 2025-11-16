@@ -1,4 +1,5 @@
-﻿use serde::{Deserialize, Serialize};
+﻿use colored::Colorize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Severity {
@@ -32,4 +33,13 @@ impl DiagnosticIssue {
 pub struct DiagnosticReport {
     pub summary: String,
     pub issues: Vec<DiagnosticIssue>,
+}
+
+
+pub fn color_severity(s: &String, severity: Severity) -> String {
+    match severity {
+        Severity::Info => s.bright_cyan().to_string(),
+        Severity::Warning => s.yellow().to_string(),
+        Severity::Error => s.red().to_string(),
+    }
 }

@@ -1,6 +1,6 @@
 ﻿use colored::Colorize;
 use crate::diagnostics::diagnostic::Diagnostic;
-use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
+use crate::diagnostics::diagnostic_report::{color_severity, DiagnosticIssue, DiagnosticReport, Severity};
 use k8s_openapi::api::core::v1::Endpoints;
 use kube::api::ListParams;
 use kube::runtime::reflector::Lookup;
@@ -28,11 +28,11 @@ pub struct ServicesDiagnosticReport {
 impl ServicesDiagnosticReport {
     pub fn output_report(self) {
         println!("\n{} {}", "Services Diagnostics: ".bold(), self.meta.summary.yellow());
-        for node_report in self.meta.issues {
+        for issue in self.meta.issues {
             println!("{} {} : {}",
                      "•".cyan(),
-                     node_report.resource.red(),
-                     node_report.message,
+                     color_severity(&issue.resource, issue.severity),
+                     issue.message,
             );
         }
     }

@@ -1,5 +1,5 @@
 ﻿use crate::diagnostics::diagnostic::Diagnostic;
-use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
+use crate::diagnostics::diagnostic_report::{color_severity, DiagnosticIssue, DiagnosticReport, Severity};
 use colored::Colorize;
 use k8s_openapi::api::core::v1::Node;
 use kube::api::ListParams;
@@ -25,11 +25,11 @@ pub struct NodesDiagnosticReport {
 impl NodesDiagnosticReport {
     pub fn output_report(self) {
         println!("\n{} {}", "Nodes Diagnostics: ".bold(), self.meta.summary.yellow());
-        for node_report in self.meta.issues {
+        for issue in self.meta.issues {
             println!("{} {} : {}",
                      "•".cyan(),
-                     node_report.resource.red(),
-                     node_report.message,
+                     color_severity(&issue.resource, issue.severity),
+                     issue.message,
             );
         }
     }
@@ -39,6 +39,8 @@ impl<'a> Diagnostic for NodesDiagnostic<'a> {
     type Report = NodesDiagnosticReport;
 
     async fn generate_report(&self) -> anyhow::Result<NodesDiagnosticReport> {
+        const TITLE: &str = "Node";
+
         let nodes: Api<Node> = Api::all(self.client.clone());
         let node_list = nodes.list(&ListParams::default()).await?;
 
@@ -52,7 +54,7 @@ impl<'a> Diagnostic for NodesDiagnostic<'a> {
                 for condition in node_condition {
                     if condition.type_ == "Ready" && condition.status == "False" {
                         issues.push(DiagnosticIssue::new(
-                            "Node".to_string(),
+                            TITLE,
                             condition.reason.clone().unwrap_or_default(),
                             Severity::Info,
                         ));

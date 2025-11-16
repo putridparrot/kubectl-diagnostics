@@ -4,7 +4,7 @@ use k8s_openapi::api::core::v1::{Event};
 use kube::{Api, Client};
 use kube::api::ListParams;
 use crate::diagnostics::diagnostic::Diagnostic;
-use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
+use crate::diagnostics::diagnostic_report::{color_severity, DiagnosticIssue, DiagnosticReport, Severity};
 
 pub struct EventsDiagnostic<'a> {
     client: &'a Client,
@@ -28,11 +28,11 @@ pub struct EventsDiagnosticReport {
 impl EventsDiagnosticReport {
     pub fn output_report(self) {
         println!("\n{} {}", "Events Diagnostics: ".bold(), self.meta.summary.yellow());
-        for event_report in self.meta.issues {
+        for issue in self.meta.issues {
             println!("{} {} : {}",
                      "•".cyan(),
-                     event_report.resource.red(),
-                     event_report.message,
+                     color_severity(&issue.resource, issue.severity),
+                     issue.message,
             );
         }
     }
@@ -62,7 +62,7 @@ impl<'a> Diagnostic for EventsDiagnostic<'a> {
             issues.push(DiagnosticIssue::new(
                 involved,
                 format!("({}) {} {} {}", reason.bright_yellow(), ts_str.dimmed(), msg, source.dimmed()),
-                Severity::Warning,
+                Severity::Error,
             ));
         }
 

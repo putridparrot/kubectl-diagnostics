@@ -3,7 +3,7 @@ use k8s_openapi::api::core::v1::Pod;
 use kube::{Api, Client};
 use kube::api::ListParams;
 use crate::diagnostics::diagnostic::Diagnostic;
-use crate::diagnostics::diagnostic_report::{DiagnosticIssue, DiagnosticReport, Severity};
+use crate::diagnostics::diagnostic_report::{color_severity, DiagnosticIssue, DiagnosticReport, Severity};
 
 pub struct PodsDiagnostic<'a> {
     client: &'a Client,
@@ -27,11 +27,11 @@ pub struct PodsDiagnosticReport {
 impl PodsDiagnosticReport {
     pub fn output_report(self) {
         println!("\n{} {}", "Pod Diagnostics: ".bold(), self.meta.summary.yellow());
-        for pod_report in self.meta.issues {
+        for issue in self.meta.issues {
             println!("{} {} : {}",
                      "•".cyan(),
-                     pod_report.resource.red(),
-                     pod_report.message,
+                     color_severity(&issue.resource, issue.severity),
+                     issue.message,
             );
         }
     }

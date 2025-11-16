@@ -28,47 +28,51 @@ diagnostics services --namespace stg
 diagnostics all --namespace tst
 ```
 
+## Config Map Diagnostics
+
+TODO:
+
+```aiignore
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-config
+data:
+  LOG_LEVEL: "info"
+  LOG_LEVEL: "debug"  # This overwrites the previous value
+```
+
+- Information: Check if keys are missing
+
+## Deployments Diagnostics
+
+TODO:
+
 ## Event Diagnostics
 
 TODO:
 
-kubectl get events -n my-ns --sort-by='.lastTimestamp'
+## Ingress Diagnostics
 
-Highlight:
-- Failed scheduling
-- Probe failures
-- Resource quota issues
-
-Output Formats:
-- Console (colorized), for local dev
-- Markdown for CI logs
-- JSON for pipeline parsing
-- File artifact for Azure DevOps upload
+TODO:
 
 ## Node Diagnostics
+
+TODO:
 
 ## Pod Diagnostics
 
 TODO:
 
-kubectl get pods -n my-ns -o json
+## Resources Diagnostics
 
-Filter pods by:
-- status.phase != Running
-- containerStatuses[].state.waiting.reason
-- restartCount > 3
+TODO:
 
-Parse JSON and extract:
-- CrashLoopBackOff
-- ImagePullBackOff
-- Readiness probe failures
+## Secrets Diagnostics
+
+TODO:
 
 ## Service Diagnostics
 
- 
-## Azure Devops Integration
-
-- Save report to diagnostics.md or diagnostics.json
-- Upload with PublishBuildArtifacts
-- Optionally emit ##[error] or ##[warning] for pipeline annotations
+TODO:
 

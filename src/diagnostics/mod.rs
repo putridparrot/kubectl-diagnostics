@@ -1,14 +1,14 @@
 ﻿pub mod output_mode;
 pub mod diagnostic_report;
 //#[cfg(feature = "pods")]
-pub mod pods_diagnostics;
 pub mod diagnostic;
-pub mod events_diagnostic;
-pub mod nodes_diagnostic;
-pub mod services_diagnostics;
 
-pub use diagnostic::*;
-pub use events_diagnostic::*;
-pub use nodes_diagnostic::*;
-pub use pods_diagnostics::*;
-pub use services_diagnostics::*;
+pub mod pods;
+pub mod services;
+pub mod nodes;
+pub mod events;
+pub mod config_map;
+pub mod secrets;
+pub mod resources;
+pub mod ingress;
+pub mod deployment;
