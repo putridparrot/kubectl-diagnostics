@@ -9,9 +9,14 @@ kubectl plugin, or run using it's executable name.
 
 Subcommands:
 
-- events: Show sorted events
+- configmaps: Show configmap status
+- deployments: Show deployment status
+- events: Show event status
+- ingress: Show ingress status
 - nodes: Show node status
 - pods: Show pod status and container errors
+- resources: Show resource status
+- secrets: Show secret status
 - services: Show service status
 - all: Run all subcommands
 
@@ -46,7 +51,8 @@ data:
 
 ## Deployments Diagnostics
 
-TODO:
+- Check if rollout failed
+- Check is has unavailble replicas
 
 ## Event Diagnostics
 
@@ -54,25 +60,34 @@ TODO:
 
 ## Ingress Diagnostics
 
-TODO:
+- Check if loadbalancer is ready
+- Check if ingress has endpoints
+- Check if ingress is healthy
 
 ## Node Diagnostics
 
-TODO:
+- Check if nodes are ready
 
 ## Pod Diagnostics
 
-TODO:
+- Check pod phase
+- Check pod status
+- Check pod restarts
 
 ## Resources Diagnostics
 
-TODO:
+- Check if pod containers has resource requests and limits
+- Check if pod containers has limits less than requests
+- Check if pod containers was OOMKilled
+- Check Memory, Disk and PID pressures
 
 ## Secrets Diagnostics
 
-TODO:
+- Check if key is empty
+- Check if key is unusually large
+- Check if secret has no data
+- check if secret is unused by any pods in the namespace
 
 ## Service Diagnostics
 
-TODO:
-
+- Check if endpoints are missing
